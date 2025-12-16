@@ -1,12 +1,13 @@
-import { Link, Outlet } from "react-router";
+import { NavLink, Outlet } from "react-router";
+import { CustomLink } from "./CustomLink";
 
 export const Layout = () => {
   return (
     <>
       <header>
-        <Link to="/">Home</Link>
-        <Link to="/posts">Blog</Link>
-        <Link to="/about">About</Link>
+        <CustomLink to="/">Home</CustomLink>
+        <CustomLink to="/posts">Blog</CustomLink>
+        <CustomLink to="/about">About</CustomLink>
       </header>
       <main className="container">
         <Outlet />
