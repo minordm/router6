@@ -1,10 +1,18 @@
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 import { useEffect, useState } from "react";
 
 export const Singlepage = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
+  const navigate = useNavigate();
+
+  const goBack = () => navigate("/posts", { state: `123, id: ${id}` });
+  // const goBack = () => navigate(-1);
+
+  // это плохая практика
+  // лучше использовать <Link>
+  // const goHome = () => navigate("/", { replace: false });
 
   useEffect(() => {
     fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
@@ -14,6 +22,8 @@ export const Singlepage = () => {
 
   return (
     <div className="">
+      <button onClick={goBack}>Go back</button>
+      {/* <button onClick={goHome}>Go home</button> */}
       {post && (
         <>
           <h1>{post.title}</h1>
