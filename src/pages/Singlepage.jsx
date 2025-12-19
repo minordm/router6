@@ -1,10 +1,39 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { Suspense } from "react";
+import {
+  Await,
+  Link,
+  useAsyncValue,
+  useLoaderData,
+  useNavigate,
+} from "react-router";
 
-import { useEffect, useState } from "react";
+const Post = () => {
+  const post = useAsyncValue();
+  return (
+    <>
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+    </>
+  );
+};
+
+const Comments = () => {
+  const comments = useAsyncValue();
+
+  return (
+    <>
+      {comments.map((comment) => (
+        <>
+          <h3>Name: {comment.name}</h3>
+          <p>{comment.body}</p>
+        </>
+      ))}
+    </>
+  );
+};
 
 export const Singlepage = () => {
-  const { id } = useParams();
-  const [post, setPost] = useState(null);
+  const { id, post, comments } = useLoaderData();
   const navigate = useNavigate();
 
   const goBack = () => navigate("/posts", { state: `123, id: ${id}` });
@@ -13,24 +42,45 @@ export const Singlepage = () => {
   // это плохая практика
   // лучше использовать <Link>
   // const goHome = () => navigate("/", { replace: false });
-
-  useEffect(() => {
-    fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
-      .then((res) => res.json())
-      .then((data) => setPost(data));
-  }, [id]);
+  console.log(post);
 
   return (
     <div className="">
       <button onClick={goBack}>Go back</button>
       {/* <button onClick={goHome}>Go home</button> */}
-      {post && (
-        <>
-          <h1>{post.title}</h1>
-          <p>{post.body}</p>
-          <Link to={`/posts/${id}/edit`}>Edit this post</Link>
-        </>
-      )}
+      <Suspense fallback={<p>Загрузка поста...</p>}>
+        <Await resolve={post}>
+          <Post />
+        </Await>
+      </Suspense>
+      <h2>Comments:</h2>
+      <Suspense fallback={<p>Загрузка комментариев...</p>}>
+        <Await resolve={comments}>
+          <Comments />
+        </Await>
+      </Suspense>
+      <Link to={`posts/${id}/edit`}>Edit this post</Link>
     </div>
   );
+};
+
+async function getPost(id) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`
+  );
+  return await response.json();
+}
+
+async function getComments(id) {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}/comments`
+  );
+  return await response.json();
+}
+
+// функция принимает 2 параметра {, params}
+export const postLoader = async ({ params }) => {
+  const id = params.id;
+
+  return { id, post: getPost(id), comments: getComments(id) };
 };
