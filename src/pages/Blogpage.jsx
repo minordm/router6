@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { Await, Link, useLoaderData } from "react-router";
+import ErrorPage from "./ErrorPage";
 
 export const Blogpage = () => {
   const { posts } = useLoaderData();
@@ -9,7 +10,7 @@ export const Blogpage = () => {
       <h1>Our news</h1>
       <Link to={"/posts/new"}>Add new post</Link>
       <Suspense fallback={<p>Posts loading...</p>}>
-        <Await resolve={posts}>
+        <Await resolve={posts} errorElement={<ErrorPage />}>
           {(resolvedPosts) => (
             <>
               {resolvedPosts.map((post) => (
@@ -26,7 +27,15 @@ export const Blogpage = () => {
 };
 
 async function getPosts() {
-  const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+  const response = await fetch("https://jsonplaceholder.typicode.com/postssss");
+
+  if (!response.ok) {
+    throw new Response("", {
+      status: response.status,
+      statusText: "not found page",
+    });
+  }
+
   return response.json();
 }
 

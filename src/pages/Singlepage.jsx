@@ -21,14 +21,14 @@ const Comments = () => {
   const comments = useAsyncValue();
 
   return (
-    <>
+    <ul>
       {comments.map((comment) => (
-        <>
+        <li key={comment.id}>
           <h3>Name: {comment.name}</h3>
           <p>{comment.body}</p>
-        </>
+        </li>
       ))}
-    </>
+    </ul>
   );
 };
 
@@ -42,7 +42,6 @@ export const Singlepage = () => {
   // это плохая практика
   // лучше использовать <Link>
   // const goHome = () => navigate("/", { replace: false });
-  console.log(post);
 
   return (
     <div className="">
@@ -75,12 +74,20 @@ async function getComments(id) {
   const response = await fetch(
     `https://jsonplaceholder.typicode.com/posts/${id}/comments`
   );
-  return await response.json();
+
+  if (!response.ok) {
+    throw new Response("", {
+      status: response.status,
+      statusText: "Cannot load comments",
+    });
+  }
+
+  return response.json();
 }
 
 // функция принимает 2 параметра {, params}
 export const postLoader = async ({ params }) => {
   const id = params.id;
 
-  return { id, post: getPost(id), comments: getComments(id) };
+  return { id, post: getPost(id), comments: await getComments(id) };
 };
