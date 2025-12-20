@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Await, Link, useLoaderData } from "react-router";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "./Errorpage";
 
 export const Blogpage = () => {
   const { posts } = useLoaderData();
@@ -27,7 +27,7 @@ export const Blogpage = () => {
 };
 
 async function getPosts() {
-  const response = await fetch("https://jsonplaceholder.typicode.com/postssss");
+  const response = await fetch("https://jsonplaceholder.typicode.com/posts");
 
   if (!response.ok) {
     throw new Response("", {

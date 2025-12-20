@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router";
 import useAuth from "../hook/useAuth";
 
-export const Loginpage = () => {
+export const LoginPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { sigin } = useAuth();

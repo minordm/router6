@@ -6,6 +6,7 @@ import {
   useLoaderData,
   useNavigate,
 } from "react-router";
+import ErrorPage from "./Errorpage";
 
 const Post = () => {
   const post = useAsyncValue();
@@ -22,6 +23,7 @@ const Comments = () => {
 
   return (
     <ul>
+      <h2>Comments</h2>
       {comments.map((comment) => (
         <li key={comment.id}>
           <h3>Name: {comment.name}</h3>
@@ -33,7 +35,7 @@ const Comments = () => {
 };
 
 export const Singlepage = () => {
-  const { id, post, comments } = useLoaderData();
+  const { post, id, comments } = useLoaderData();
   const navigate = useNavigate();
 
   const goBack = () => navigate("/posts", { state: `123, id: ${id}` });
@@ -47,18 +49,17 @@ export const Singlepage = () => {
     <div className="">
       <button onClick={goBack}>Go back</button>
       {/* <button onClick={goHome}>Go home</button> */}
+      <Link to={`/posts/${id}/edit`}>Edit this post</Link>
       <Suspense fallback={<p>Загрузка поста...</p>}>
-        <Await resolve={post}>
+        <Await resolve={post} errorElement={<ErrorPage />}>
           <Post />
         </Await>
       </Suspense>
-      <h2>Comments:</h2>
       <Suspense fallback={<p>Загрузка комментариев...</p>}>
-        <Await resolve={comments}>
+        <Await resolve={comments} errorElement={<ErrorPage />}>
           <Comments />
         </Await>
       </Suspense>
-      <Link to={`posts/${id}/edit`}>Edit this post</Link>
     </div>
   );
 };
@@ -67,7 +68,7 @@ async function getPost(id) {
   const response = await fetch(
     `https://jsonplaceholder.typicode.com/posts/${id}`
   );
-  return await response.json();
+  return response.json();
 }
 
 async function getComments(id) {
@@ -89,5 +90,5 @@ async function getComments(id) {
 export const postLoader = async ({ params }) => {
   const id = params.id;
 
-  return { id, post: getPost(id), comments: await getComments(id) };
+  return { id, post: await getPost(id), comments: getComments(id) };
 };

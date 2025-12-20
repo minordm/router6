@@ -1,10 +1,9 @@
-import { isRouteErrorResponse, useRouteError } from "react-router";
+import { isRouteErrorResponse, useAsyncError } from "react-router";
 
 export default function ErrorPage() {
-  const error = useRouteError();
-  const isRouteError = isRouteErrorResponse(error);
+  const error = useAsyncError();
 
-  if (isRouteError) {
+  if (isRouteErrorResponse(error)) {
     return (
       <>
         <h2>{error.status}</h2>
@@ -13,5 +12,5 @@ export default function ErrorPage() {
     );
   }
 
-  return <h2>Error</h2>;
+  return <h2>Error not in fetch</h2>;
 }
